@@ -35,6 +35,19 @@ jobs:
         run: |
           exec java -jar /opt/lib/checkstyle.jar "." -c "checkstyle_checks.xml" -f xml > results.xml
 
+      # NEW: Turn Checkstyle results into inline PR comments
+      - name: Annotate Checkstyle with reviewdog
+        if: always()  # run even if the previous step failed
+        uses: reviewdog/action-checkstyle@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          reporter: github-pr-review     # comments on PR, does NOT add a new status check
+          fail_on_error: "true"          # keep job failing when violations exist
+          level: error                   # comment severity
+          checkstyle_input: results.xml  # 👈 points to the file your job already creates
+          filter_mode: added
+
+
       - name: Print Results
         run: echo "$(cat results.xml)"
 
