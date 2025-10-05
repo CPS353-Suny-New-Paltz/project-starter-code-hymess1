@@ -15,7 +15,13 @@ public class JobResult {
         this.errorMessage = (errorMessage == null) ? "" : errorMessage;
     }
 
-    public boolean isSuccess() { return success; }
-    public String getResultText() { return resultText; }
-    public String getErrorMessage() { return errorMessage; }
+    public boolean isSuccess() { 
+    	return success;
+    	}
+    public String getResultText() { 
+    	return resultText;
+    	}
+    public String getErrorMessage() {
+    	return errorMessage;
+    	}
 }

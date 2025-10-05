@@ -15,9 +15,15 @@ public class DelimiterSpec {
         this.keyValueDelimiter = (keyValueDelimiter == null) ? ":" : keyValueDelimiter;
     }
 
-    public boolean isUseDefaults() { return useDefaults; }
-    public String getPairDelimiter() { return pairDelimiter; }
-    public String getKeyValueDelimiter() { return keyValueDelimiter; }
+    public boolean isUseDefaults() { 
+    	return useDefaults;
+    	}
+    public String getPairDelimiter() { 
+    	return pairDelimiter;
+    	}
+    public String getKeyValueDelimiter() {
+    	return keyValueDelimiter;
+    	}
 
     public static DelimiterSpec defaults() {
         return new DelimiterSpec(true, ";", ":");
