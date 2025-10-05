@@ -15,7 +15,21 @@ public class JobRequest {
         this.delimiterSpec = delimiterSpec;
     }
 
-    public String getInputSourcePointer() { return inputSourcePointer; }
-    public String getOutputDestinationPointer() { return outputDestinationPointer; }
-    public DelimiterSpec getDelimiterSpec() { return delimiterSpec; }
+    public String getInputSourcePointer() { 
+    	
+    	return inputSourcePointer; 
+    	
+    	}
+    
+    public String getOutputDestinationPointer() { 
+    	
+    	return outputDestinationPointer;
+    	
+    	}
+    
+    public DelimiterSpec getDelimiterSpec() { 
+    	
+    	return delimiterSpec;
+    	
+    	}
 }
