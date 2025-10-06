@@ -6,7 +6,7 @@ import project.annotations.ProcessAPIPrototype;
  * Prototype for the process boundary.
  * Demonstrates reading a few integers from a "source".
  */
-public class DataIOServiceProto {
+public class DataIOServicePrototype {
 
     /**
      * Single public prototype method.
