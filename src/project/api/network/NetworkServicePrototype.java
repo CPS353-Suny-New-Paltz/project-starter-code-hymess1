@@ -8,7 +8,7 @@ import project.model.JobResult;
  * Prototype for the network boundary.
  * Keep logic minimal—just demonstrate the shape of the call/response.
  */
-public class NetworkServiceProto {
+public class NetworkServicePrototype {
 
     /**
      * Single public prototype method for this boundary.

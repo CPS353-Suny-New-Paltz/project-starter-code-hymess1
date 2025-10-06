@@ -7,7 +7,7 @@ import project.annotations.ConceptualAPIPrototype;
  * Prototype for the conceptual boundary.
  * Implements a small, CPU-bound example: largest prime ≤ n.
  */
-public class EngineComputeAPIProto {
+public class EngineComputeAPIPrototype {
 
     /**
      * Single public prototype method. Non-null return always.
