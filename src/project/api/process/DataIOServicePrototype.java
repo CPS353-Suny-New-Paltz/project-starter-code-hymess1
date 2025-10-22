@@ -1,25 +1,32 @@
 package project.api.process;
 
 import project.annotations.ProcessAPIPrototype;
+import project.api.process.DataIOService.DataPointer;
+import project.api.process.DataIOService.DataWriteRequest;
+import project.api.process.DataIOService.DataWriteResponse;
 
-/**
- * Prototype for the process boundary.
- * Demonstrates reading a few integers from a "source".
- */
 public class DataIOServicePrototype {
 
-    /**
-     * Single public prototype method.
-     * Returns an int[] (assignment allows arrays) and never null.
-     */
     @ProcessAPIPrototype
-    public int[] prototypeReadIntegers(String sourcePointer) {
-        if (sourcePointer == null || sourcePointer.isEmpty()) {
-            // Non-null, empty payload on error-like conditions.
-            return new int[0];
+    public void prototype(DataIOService api) {
+        // Obtain an input pointer (simulated)
+        DataPointer input = api.readInputPointer();
+
+        // Build a destination pointer and write request (simulated)
+        DataPointer destination = new DataPointer() {
+            @Override public String asString() { return "out://destination"; }
+        };
+
+        DataWriteRequest writeReq = new DataWriteRequest() {
+            @Override public DataPointer destination() { return destination; }
+            @Override public String payload() { return "example-result"; }
+        };
+
+        DataWriteResponse writeRes = api.write(writeReq);
+
+        // Prototype only: explicit branches to satisfy style; no IO/prints.
+        if (input == null || writeRes == null || writeRes.message() == null) {
+            String ignore = "";
         }
-        // Trivial sample payload for exercising the conceptual API.
-        return new int[] { 10, 29, 42 };
     }
 }
-
