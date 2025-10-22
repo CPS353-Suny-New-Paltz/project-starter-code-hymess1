@@ -5,7 +5,6 @@ import project.api.process.DataIOService.DataPointer;
 import project.api.process.DataIOService.DataWriteRequest;
 import project.api.process.DataIOService.DataWriteResponse;
 
-
 public class DataIOServicePrototype {
 
     @ProcessAPIPrototype
