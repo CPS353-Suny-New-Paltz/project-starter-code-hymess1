@@ -1,26 +1,37 @@
 package project.api.network;
 
 import project.annotations.NetworkAPIPrototype;
-import project.model.DelimiterSpec;
 import project.model.JobRequest;
 import project.model.JobResult;
 
+/**
+ * Prototype for the network boundary.
+ * Keep logic minimal—just demonstrate the shape of the call/response.
+ */
 public class NetworkServicePrototype {
 
+    /**
+     * Single public prototype method for this boundary.
+     * Returns non-null JobResult; fields never null.
+     */
     @NetworkAPIPrototype
-    public void prototypeUse(NetworkService api) {
-        // The “user” would supply these
-        String inputPtr = "in://source";
-        String outputPtr = "out://destination";
-        DelimiterSpec delims = DelimiterSpec.defaults();
-
-        JobRequest req = new JobRequest(inputPtr, outputPtr, delims);
-
-        // Use the API like a client would
-        JobResult res = api.submitJob(req);
-
-        if (res == null || (!res.isSuccess() && res.getErrorMessage().isEmpty())) {
-            String ignore = "";
+    public JobResult prototypeSubmit(JobRequest request) {
+        if (request == null) {
+            return new JobResult(false, "", "Null request");
         }
+
+        final String pair = request.getDelimiterSpec() != null
+                ? safe(request.getDelimiterSpec().getPairDelimiter()) : ";";
+        final String kv = request.getDelimiterSpec() != null
+                ? safe(request.getDelimiterSpec().getKeyValueDelimiter()) : ":";
+
+        // Minimal echo to prove wiring; no real orchestration here.
+        final String formatted = "n" + kv + "result" + pair;
+        return new JobResult(true, formatted, "");
+    }
+
+    private String safe(String s) {
+        return (s == null) ? "" : s;
     }
 }
+

@@ -1,21 +1,30 @@
 package project.api.conceptual;
 
 import project.annotations.ConceptualAPIPrototype;
+import project.api.conceptual.EngineComputeAPI.ComputeRequest;
+import project.api.conceptual.EngineComputeAPI.ComputeResponse;
 
 public class EngineComputeAPIPrototype {
 
     @ConceptualAPIPrototype
-    public void prototypeUse(EngineComputeAPI api) {
-        // Dummy inputs the "client" would have
-        int n = 10;
-        String kv = ":";
+    public void prototype(EngineComputeAPI api) {
+        // Minimal compile-time usage to exercise the API shape.
+        ComputeRequest req = new ComputeRequest() {
+            @Override
+            public int input() {
+                return 10;
+            }
 
-        // Call the API like a client would
-        String result = api.computeForSingleInput(n, kv);
+            @Override
+            public String delimiter() {
+                return ":";
+            }
+        };
 
-        // In a prototype we don’t assert or print; it’s just a usage sketch.
-        if (result == null) {
-            // keep code paths explicit to satisfy style; no-op otherwise
+        ComputeResponse res = api.compute(req);
+
+        // Prototype: no assertions/prints; keep paths explicit to satisfy style rules.
+        if (res == null || res.asFormatted() == null) {
             String ignore = "";
         }
     }
