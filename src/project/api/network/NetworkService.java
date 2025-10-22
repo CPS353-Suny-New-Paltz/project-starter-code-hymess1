@@ -6,17 +6,14 @@ import project.model.JobResult;
 
 /**
  * Network boundary API: user ↔ compute engine.
- * - Stateless, stable contract
- * - Returns a wrapper (JobResult) instead of void
+ * Returns a wrapper (JobResult) and never throws across the boundary.
  */
 @NetworkAPI
 public interface NetworkService {
 
     /**
-     * Submit a job containing input/output pointers and delimiters.
-     * Never returns null. On failure, returns JobResult with success=false
-     * and a non-empty error message.
+     * Submit a job describing input/output sources and delimiters.
+     * Never returns null. Failures are represented in the JobResult.
      */
     JobResult submitJob(JobRequest request);
 }
-

@@ -4,21 +4,54 @@ import project.annotations.ProcessAPI;
 
 /**
  * Process boundary API: data storage system ↔ compute engine.
- * - Abstracts IO details behind simple, stable contracts.
+ * Abstracts IO details behind stable wrapper types.
  */
 @ProcessAPI
 public interface DataIOService {
 
     /**
-     * Returns an abstract pointer describing the input source (e.g., path/URI).
-     * Never returns null; return "" if not configured.
+     * Returns a pointer to the configured input source.
+     * Never returns null.
      */
-    String readInputSourcePointer();
+    DataPointer readInputPointer();
 
     /**
-     * Writes result text to the destination pointer.
-     * Returns true on success, false on failure. Never throws across boundary.
+     * Writes result data to a destination pointer.
+     * Never returns null; failures are encoded in the response.
      */
-    boolean writeToDestination(String destinationPointer, String resultText);
-}
+    DataWriteResponse write(DataWriteRequest request);
 
+    // -------- Wrapper types (nested for prototype phase) --------
+
+    /**
+     * Opaque pointer to a data location (file path, URI, DB key, etc.).
+     */
+    interface DataPointer {
+        String asString();
+    }
+
+    /**
+     * Request to write data to a destination.
+     */
+    interface DataWriteRequest {
+        DataPointer destination();
+        String payload();
+    }
+
+    /**
+     * Response from a write operation.
+     */
+    interface DataWriteResponse {
+        StatusCode code();
+        String message(); // optional details; may be empty but never null
+
+        enum StatusCode {
+            SUCCESS,
+            FAILURE;
+
+            public boolean success() {
+                return this == SUCCESS;
+            }
+        }
+    }
+}
