@@ -49,7 +49,9 @@ public interface DataIOService {
             SUCCESS,
             FAILURE;
 
-            public boolean success() { return this == SUCCESS; }
+            public boolean success() {
+                return this == SUCCESS;
+            }
         }
     }
 }

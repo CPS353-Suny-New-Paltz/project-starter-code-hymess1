@@ -14,12 +14,22 @@ public class DataIOServicePrototype {
 
         // Build a destination pointer and write request (simulated)
         DataPointer destination = new DataPointer() {
-            @Override public String asString() { return "out://destination"; }
+            @Override
+            public String asString() {
+                return "out://destination";
+            }
         };
 
         DataWriteRequest writeReq = new DataWriteRequest() {
-            @Override public DataPointer destination() { return destination; }
-            @Override public String payload() { return "example-result"; }
+            @Override
+            public DataPointer destination() {
+                return destination;
+            }
+
+            @Override
+            public String payload() {
+                return "example-result";
+            }
         };
 
         DataWriteResponse writeRes = api.write(writeReq);
