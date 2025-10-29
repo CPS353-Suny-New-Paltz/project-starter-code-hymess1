@@ -31,9 +31,13 @@ jobs:
           cd "${GITHUB_WORKSPACE}"
           
       # Configures and runs checkstyle
+      
+
+      # ... (other steps unchanged)
       - name: Run Checkstyle
         run: |
-          exec java -jar /opt/lib/checkstyle.jar "." -c "checkstyle_checks.xml" -f xml > results.xml
+          exec java -jar /opt/lib/checkstyle.jar -c "checkstyle_checks.xml" -f xml "." > results.xml
+      # ... (rest of file unchanged)
 
       - name: Print Results
         run: echo "$(cat results.xml)"
