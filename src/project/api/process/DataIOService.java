@@ -10,10 +10,10 @@ import project.annotations.ProcessAPI;
 public interface DataIOService {
 
     /**
-     * Returns a pointer to the configured input source.
+     * Reads data from a client-specified source.
      * Never returns null.
      */
-    DataPointer readInputPointer();
+    DataReadResponse read(DataReadRequest request);
 
     /**
      * Writes result data to a destination pointer.
@@ -28,6 +28,20 @@ public interface DataIOService {
      */
     interface DataPointer {
         String asString();
+    }
+
+    /**
+     * Request to read data from a source.
+     */
+    interface DataReadRequest {
+        DataPointer source();
+    }
+
+    /**
+     * Response from a read operation.
+     */
+    interface DataReadResponse {
+        String payload(); // the retrieved data
     }
 
     /**
@@ -55,3 +69,4 @@ public interface DataIOService {
         }
     }
 }
+
