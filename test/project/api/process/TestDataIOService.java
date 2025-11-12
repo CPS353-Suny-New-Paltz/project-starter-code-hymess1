@@ -7,7 +7,6 @@ import project.api.process.DataIOService.*;
 
 /**
  * Smoke test for the process API implementation.
- * Uses a mock DataPointer to isolate file/URI operations.
  */
 public class TestDataIOService {
 
