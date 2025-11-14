@@ -1,86 +1,100 @@
 package project.integration;
 
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import java.util.List;
 
 import project.api.conceptual.EngineComputeAPI;
+import project.api.conceptual.EngineComputeAPIImpl;
+import project.api.network.NetworkService;
+import project.api.network.NetworkServiceImpl;
 import project.api.process.DataIOService;
+import project.api.process.DataIOService.DataPointer;
+import project.api.process.DataIOService.DataReadRequest;
+import project.api.process.DataIOService.DataWriteRequest;
+import project.api.process.DataIOService.DataWriteResponse;
 import project.memory.InMemoryInputConfig;
 import project.memory.InMemoryOutputConfig;
 import project.memory.InMemoryDataIOService;
 
-/**
- * Integration test for the conceptual engine and data store.
- * This is EXPECTED TO FAIL for Checkpoint 3 (engine not implemented yet).
- */
 public class ComputeEngineIntegrationTest {
 
     @Test
     public void testComputeEngineIntegration_noDelimiterSpecified() {
 
-        // Input: [1, 10, 25]
-        InMemoryInputConfig inputConfig = new InMemoryInputConfig(List.of(1, 10, 25));
+        InMemoryInputConfig inputConfig =
+                new InMemoryInputConfig(List.of(1, 10, 25));
         InMemoryOutputConfig outputConfig = new InMemoryOutputConfig();
-        DataIOService dataStore = new InMemoryDataIOService(inputConfig, outputConfig);
+        DataIOService dataStore =
+                new InMemoryDataIOService(inputConfig, outputConfig);
 
-        // Empty conceptual engine implementation
-        EngineComputeAPI engine = new EngineComputeAPI() {
+        // Required real implementations for Checkpoint 3
+        EngineComputeAPI engine = new EngineComputeAPIImpl();
+        NetworkService network = new NetworkServiceImpl(dataStore);
+
+        // Read
+        DataPointer srcPtr = new DataPointer() {
             @Override
-            public ComputeResponse compute(ComputeRequest request) {
-                // placeholder
-                return () -> "";
+            public String asString() {
+                return "in://memory";
             }
         };
 
-        // Read the inputs from the in-memory store
-        DataIOService.DataReadRequest readReq = () -> () -> "in://memory";
-        DataIOService.DataReadResponse readRes = dataStore.read(readReq);
+        DataReadRequest readReq = new DataReadRequest() {
+            @Override
+            public DataPointer source() {
+                return srcPtr;
+            }
+        };
 
-        // The test input values
+        dataStore.read(readReq);
+
         List<Integer> inputs = inputConfig.getInputValues();
 
-        // Compute once per input
         for (int value : inputs) {
 
-            EngineComputeAPI.ComputeRequest computeReq = new EngineComputeAPI.ComputeRequest() {
+            EngineComputeAPI.ComputeRequest computeReq =
+                    new EngineComputeAPI.ComputeRequest() {
+                        @Override
+                        public int input() {
+                            return value;
+                        }
 
+                        @Override
+                        public String delimiter() {
+                            return null;
+                        }
+                    };
+
+            String formatted = engine.compute(computeReq).asFormatted();
+
+            DataPointer dstPtr = new DataPointer() {
                 @Override
-                public int input() {
-                    return value;
-                }
-
-                @Override
-                public String delimiter() {
-                    return null;  // NO delimiter specified
-                }
-            };
-
-            EngineComputeAPI.ComputeResponse computeRes = engine.compute(computeReq);
-
-            // Write to output store
-            DataIOService.DataWriteRequest writeReq = new DataIOService.DataWriteRequest() {
-
-                @Override
-                public DataIOService.DataPointer destination() {
-                    return () -> "out://memory";
-                }
-
-                @Override
-                public String payload() {
-                    return computeRes.asFormatted();
+                public String asString() {
+                    return "out://memory";
                 }
             };
 
-            DataIOService.DataWriteResponse writeRes = dataStore.write(writeReq);
-            assertTrue(writeRes.code().success(), "Write should succeed");
+            DataWriteRequest writeReq =
+                    new DataWriteRequest() {
+                        @Override
+                        public DataPointer destination() {
+                            return dstPtr;
+                        }
+
+                        @Override
+                        public String payload() {
+                            return formatted;
+                        }
+                    };
+
+            DataWriteResponse writeRes = dataStore.write(writeReq);
+            assertTrue(writeRes.code().success());
         }
 
-        // Future expected output (will fail now — correct)
-        List<String> expectedOutput = List.of("1:1", "10:100", "25:625");
+        List<String> expected =
+                List.of("1:1", "10:100", "25:625");
 
-        assertEquals(expectedOutput, outputConfig.getOutputValues(),
-                "Output should match what the engine will eventually compute");
+        assertEquals(expected, outputConfig.getOutputValues());
     }
 }
