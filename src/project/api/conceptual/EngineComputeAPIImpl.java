@@ -5,15 +5,12 @@ import project.api.conceptual.EngineComputeAPI.ComputeResponse;
 
 /**
  * Empty implementation for Checkpoint 3.
- * Stateless conceptual compute placeholder.
+ * Does NOT compute yet. Returns empty placeholders.
  */
 public class EngineComputeAPIImpl implements EngineComputeAPI {
 
     @Override
     public ComputeResponse compute(ComputeRequest request) {
-        final int n = (request == null) ? 0 : request.input();
-        final String delim = (request == null || request.delimiter() == null) ? ":" : request.delimiter();
-
-        return () -> n + delim + "TBD";
+        return () -> "";   // Completely empty output for CP3
     }
 }
