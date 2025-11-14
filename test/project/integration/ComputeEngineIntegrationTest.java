@@ -1,47 +1,37 @@
 package project.integration;
 
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import java.util.List;
 
 import project.api.conceptual.EngineComputeAPI;
+import project.api.conceptual.EngineComputeAPIImpl;
+import project.api.network.NetworkService;
+import project.api.network.NetworkServiceImpl;
 import project.api.process.DataIOService;
 import project.memory.InMemoryInputConfig;
 import project.memory.InMemoryOutputConfig;
 import project.memory.InMemoryDataIOService;
 
-/**
- * Integration test for the conceptual engine and data store.
- * This is EXPECTED TO FAIL for Checkpoint 3 (engine not implemented yet).
- */
 public class ComputeEngineIntegrationTest {
 
     @Test
     public void testComputeEngineIntegration_noDelimiterSpecified() {
 
-        // Input: [1, 10, 25]
         InMemoryInputConfig inputConfig = new InMemoryInputConfig(List.of(1, 10, 25));
         InMemoryOutputConfig outputConfig = new InMemoryOutputConfig();
         DataIOService dataStore = new InMemoryDataIOService(inputConfig, outputConfig);
 
-        // Empty conceptual engine implementation
-        EngineComputeAPI engine = new EngineComputeAPI() {
-            @Override
-            public ComputeResponse compute(ComputeRequest request) {
-                // placeholder
-                return () -> "";
-            }
-        };
+        EngineComputeAPI engine = new EngineComputeAPIImpl();
 
-        // Read the inputs from the in-memory store
+        NetworkService network = new NetworkServiceImpl(dataStore);
+
+        // Read inputs
         DataIOService.DataReadRequest readReq = () -> () -> "in://memory";
         DataIOService.DataReadResponse readRes = dataStore.read(readReq);
 
-        // The test input values
         List<Integer> inputs = inputConfig.getInputValues();
 
-        // Compute once per input
         for (int value : inputs) {
 
             EngineComputeAPI.ComputeRequest computeReq = new EngineComputeAPI.ComputeRequest() {
@@ -53,17 +43,15 @@ public class ComputeEngineIntegrationTest {
 
                 @Override
                 public String delimiter() {
-                    return null;  // NO delimiter specified
+                    return null;
                 }
             };
 
             EngineComputeAPI.ComputeResponse computeRes = engine.compute(computeReq);
 
-            // Write to output store
             DataIOService.DataWriteRequest writeReq = new DataIOService.DataWriteRequest() {
-
                 @Override
-                public DataIOService.DataPointer destination() {
+                public DataPointer destination() {
                     return () -> "out://memory";
                 }
 
@@ -77,9 +65,7 @@ public class ComputeEngineIntegrationTest {
             assertTrue(writeRes.code().success(), "Write should succeed");
         }
 
-        // Future expected output (will fail now — correct)
         List<String> expectedOutput = List.of("1:1", "10:100", "25:625");
-
         assertEquals(expectedOutput, outputConfig.getOutputValues(),
                 "Output should match what the engine will eventually compute");
     }
