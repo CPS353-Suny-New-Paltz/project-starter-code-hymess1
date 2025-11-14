@@ -1,7 +1,9 @@
 package project.api.network;
 
 import static org.junit.jupiter.api.Assertions.fail;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import org.junit.jupiter.api.Test;
 import project.api.process.DataIOService;
 import project.model.DelimiterSpec;

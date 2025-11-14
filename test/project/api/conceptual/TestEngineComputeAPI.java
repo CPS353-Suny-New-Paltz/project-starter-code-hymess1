@@ -1,6 +1,7 @@
 package project.api.conceptual;
 
 import static org.junit.jupiter.api.Assertions.fail;
+
 import org.junit.jupiter.api.Test;
 
 /**
@@ -17,8 +18,15 @@ public class TestEngineComputeAPI {
 
             // Create a simple input request
             EngineComputeAPI.ComputeRequest req = new EngineComputeAPI.ComputeRequest() {
-                public int input() { return 5; }
-                public String delimiter() { return ":"; }
+                @Override
+                public int input() {
+                    return 5;
+                }
+
+                @Override
+                public String delimiter() {
+                    return ":";
+                }
             };
 
             // Call the compute method
