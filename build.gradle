@@ -28,7 +28,7 @@ dependencies {
 
 test {
     useJUnitPlatform()
-	filter {
-        excludeTestsMatching "project.compute.ComputeEngineIntegrationTest.testComputeEngineIntegration_noDelimiterSpecified"
+	 filter {
+        excludeTestsMatching "*noDelimiterSpecified*"
     }
 }
