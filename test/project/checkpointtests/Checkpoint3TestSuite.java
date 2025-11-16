@@ -25,6 +25,7 @@ import spoon.reflect.visitor.Filter;
  */
 public class Checkpoint3TestSuite {
     
+	
     private static Collection<CtType<?>> allSrcTypes;
     private static Collection<CtType<?>> allTestTypes;
     
