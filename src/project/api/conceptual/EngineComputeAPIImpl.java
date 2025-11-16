@@ -26,6 +26,7 @@ public class EngineComputeAPIImpl implements EngineComputeAPI {
 
         // Compute the largest prime factor for the input.
         final int result = largestPrimeFactor(n);
+        
 
         // Build the final "n:result" style string.
         final String formatted = n + delimiter + result;
@@ -68,7 +69,7 @@ public class EngineComputeAPIImpl implements EngineComputeAPI {
         int maxPrime = -1;
 
         // First remove all factors of 2.
-        // This handles even numbers efficiently before we start checking odd ones.
+        // This handles even numbers before we start checking odd ones.
         while (n % 2 == 0) {
             maxPrime = 2;
             n /= 2;
