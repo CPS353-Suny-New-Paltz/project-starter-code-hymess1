@@ -28,6 +28,7 @@ public class Checkpoint3TestSuite {
     private static Collection<CtType<?>> allSrcTypes;
     private static Collection<CtType<?>> allTestTypes;
     
+    
     @BeforeAll
     public static void initializeAst() throws Exception {
         List<Class<?>> allTestClasses = Utils.loadAllTestClasses();
