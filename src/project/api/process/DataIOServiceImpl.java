@@ -78,20 +78,28 @@ public class DataIOServiceImpl implements DataIOService {
     private DataWriteResponse basicSuccess(String msg) {
         return new DataWriteResponse() {
             @Override
-            public StatusCode code() { return StatusCode.SUCCESS; }
+            public StatusCode code() { 
+            	return StatusCode.SUCCESS; 
+            	}
 
             @Override
-            public String message() { return msg; }
+            public String message() { 
+            	return msg; 
+            	}
         };
     }
 
     private DataWriteResponse basicFailure(String msg) {
         return new DataWriteResponse() {
             @Override
-            public StatusCode code() { return StatusCode.FAILURE; }
+            public StatusCode code() { 
+            	return StatusCode.FAILURE; 
+            	}
 
             @Override
-            public String message() { return msg; }
+            public String message() { 
+            	return msg; 
+            	}
         };
     }
 }
