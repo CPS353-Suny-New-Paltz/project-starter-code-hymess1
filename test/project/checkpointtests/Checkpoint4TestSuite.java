@@ -17,7 +17,7 @@ public class Checkpoint4TestSuite {
         
         // Checkpoint 4 Note: If you chose a different input file format (ex: csv), you're
         // allowed to update this line to create differently-formatted input data
-        Files.write(inputPath, "1\n2\n3".getBytes());
+        Files.write(inputPath, "1,2,3".getBytes());
         
         ManualTestingFramework.main(new String[] {});
         

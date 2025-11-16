@@ -19,11 +19,18 @@ public class ManualTestingFramework {
         // TODO 1:
         // Instantiate a real (ie, class definition lives in the src/ folder) implementation 
         // of all 3 APIs
-        //
+        
+        NetworkService network = new NetworkServiceImpl();
+        DataIOService dataIO = new DataIOServiceImpl();
+        EngineComputeAPI engine = new EngineComputeAPIImpl();
         // TODO 2:
         // Run a computation with an input file of <root project dir>/manualTestInput.txt
         // and an output of <root project dir>/manualTestOutput.txt, with a delimiter of ',' 
-        //
+        ComputationCoordinator coordinator =
+                new CoordinatorImpl(network, dataIO, engine);
+
+            FileInputConfig inputCfg = new FileInputConfig(INPUT, ",");
+            FileOutputConfig outputCfg = new FileOutputConfig(OUTPUT);
         //
         // Helpful hint: the working directory of this program is <root project dir>,
         // so you can refer to the files just using the INPUT/OUTPUT constants. You do not 
