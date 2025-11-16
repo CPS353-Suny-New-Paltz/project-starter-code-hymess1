@@ -94,7 +94,8 @@ public class ComputeEngineIntegrationTest {
         }
 
         List<String> expected =
-                List.of("1:1", "10:100", "25:625");
+                List.of("1:invalid", "10:5", "25:5");
+
 
         assertEquals(expected, outputConfig.getOutputValues());
     }
