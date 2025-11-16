@@ -49,6 +49,9 @@ public class DataIOServiceImpl implements DataIOService {
 
     /**
      * Writes a string payload to the destination file.
+     * For this project, multiple writes to the same file are appended as a single
+     * comma-separated line (no newlines), so Checkpoint4 can see all results
+     * on one line.
      */
     @Override
     public DataWriteResponse write(DataWriteRequest request) {
@@ -62,17 +65,23 @@ public class DataIOServiceImpl implements DataIOService {
             payload = "";
         }
 
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(path, true))) {
-            // Appending keeps results listed line-by-line if multiple values are written
+        java.io.File outFile = new java.io.File(path);
+
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(outFile, true))) {
+            // If the file already has content, separate entries with a comma.
+            if (outFile.exists() && outFile.length() > 0) {
+                writer.write(",");
+            }
+
             writer.write(payload);
-            writer.newLine();
+            // No newline: keep everything on a single comma-separated line.
 
             return basicSuccess("Successfully wrote to file.");
-
         } catch (IOException e) {
             return basicFailure("Failed to write to file: " + e.getMessage());
         }
     }
+
 
     // Helpers to build clean responses
     private DataWriteResponse basicSuccess(String msg) {
