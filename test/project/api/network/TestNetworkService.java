@@ -23,7 +23,8 @@ public class TestNetworkService {
             DataIOService mockIO = mock(DataIOService.class);
 
             // Create the API implementation under test
-            NetworkService api = new NetworkServiceImpl(mockIO);
+            EngineComputeAPI compute = new EngineComputeAPIImpl();
+            NetworkService api = new NetworkServiceImpl(mockIO, compute);
 
             // Create a simple job request
             JobRequest req = new JobRequest("in://mock", "out://mock", DelimiterSpec.defaults());

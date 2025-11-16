@@ -31,7 +31,7 @@ public class ComputeEngineIntegrationTest {
 
         // Required real implementations for Checkpoint 3
         EngineComputeAPI engine = new EngineComputeAPIImpl();
-        NetworkService network = new NetworkServiceImpl(dataStore);
+        NetworkService network = new NetworkServiceImpl(dataStore, engine);
 
         // Read
         DataPointer srcPtr = new DataPointer() {
