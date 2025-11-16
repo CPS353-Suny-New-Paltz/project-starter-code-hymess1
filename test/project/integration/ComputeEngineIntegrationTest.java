@@ -31,7 +31,7 @@ public class ComputeEngineIntegrationTest {
 
         // Required real implementations for Checkpoint 3
         EngineComputeAPI engine = new EngineComputeAPIImpl();
-        NetworkService network = new NetworkServiceImpl(dataStore);
+        NetworkService network = new NetworkServiceImpl(dataStore, engine);
 
         // Read
         DataPointer srcPtr = new DataPointer() {
@@ -94,7 +94,8 @@ public class ComputeEngineIntegrationTest {
         }
 
         List<String> expected =
-                List.of("1:1", "10:100", "25:625");
+                List.of("1:-1", "10:5", "25:5");
+
 
         assertEquals(expected, outputConfig.getOutputValues());
     }
