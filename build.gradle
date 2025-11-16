@@ -30,8 +30,6 @@ dependencies {
 test {
     useJUnitPlatform()
 
-    filter {
-        excludeTestsMatching "*noDelimiterSpecified*"
-    }
+    
 }
 
