@@ -7,6 +7,9 @@ import project.api.process.DataIOService.DataReadResponse;
 import project.api.process.DataIOService.DataWriteRequest;
 import project.api.process.DataIOService.DataWriteResponse;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 public class DataIOServicePrototype {
 
     @ProcessAPIPrototype
@@ -17,13 +20,21 @@ public class DataIOServicePrototype {
         // Wrap it in a read request
         DataReadRequest readRequest = () -> source;
 
-        // Call the new read() method instead of readInputPointer()
+        // Call the read() method
         DataReadResponse readResponse = api.read(readRequest);
+
+        // Convert List<Integer> → comma-separated string for writing
+        List<Integer> ints = readResponse.payload();
+        String joined = (ints == null)
+                ? ""
+                : ints.stream()
+                      .map(String::valueOf)
+                      .collect(Collectors.joining(","));
 
         // Build a destination pointer
         DataPointer destination = () -> "out://destination";
 
-        // Build a write request using the data we "read"
+        // Build a write request using the converted string
         DataWriteRequest writeRequest = new DataWriteRequest() {
             @Override
             public DataPointer destination() {
@@ -32,7 +43,7 @@ public class DataIOServicePrototype {
 
             @Override
             public String payload() {
-                return readResponse.payload();
+                return joined;
             }
         };
 
