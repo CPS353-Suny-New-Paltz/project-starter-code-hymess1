@@ -4,6 +4,6 @@ The system will take a single positive integer and return its largest prime fact
 
 ## Overall System Diagram
 
+![System Diagram](https://raw.githubusercontent.com/CPS353-Suny-New-Paltz/project-starter-code-hymess1/CP4-revisions/src/project/annotations/System-Diagram.jpg)
 
-![System Diagram](https://github.com/CPS353-Suny-New-Paltz/project-starter-code-hymess1/blob/CP4-revisions/src/project/annotations/system-diagram.jpeg?raw=true)
 
