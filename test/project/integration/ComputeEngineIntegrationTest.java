@@ -1,7 +1,10 @@
 package project.integration;
 
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.util.List;
 
@@ -16,6 +19,7 @@ import project.memory.InMemoryDataIOService;
 import project.model.DelimiterSpec;
 import project.model.JobRequest;
 import project.model.JobResult;
+
 
 public class ComputeEngineIntegrationTest {
 
