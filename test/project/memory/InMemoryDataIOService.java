@@ -20,16 +20,13 @@ public class InMemoryDataIOService implements DataIOService {
 
     @Override
     public DataReadResponse read(DataReadRequest request) {
-        // Convert the input integers into a single payload string (e.g. "1,2,3")
+        // Return the input values directly as a List<Integer>
         List<Integer> inputs = inputConfig.getInputValues();
-        String joined = (inputs == null || inputs.isEmpty())
-                ? ""
-                : inputs.stream().map(Object::toString).reduce((a, b) -> a + "," + b).get();
 
         return new DataReadResponse() {
             @Override
-            public String payload() {
-                return joined;
+            public List<Integer> payload() {
+                return inputs; // already a List<Integer>
             }
         };
     }
