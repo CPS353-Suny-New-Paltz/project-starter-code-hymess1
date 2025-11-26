@@ -1,8 +1,8 @@
 package project.integration;
 
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
+
 import java.util.List;
 
 import project.api.conceptual.EngineComputeAPI;
@@ -10,93 +10,47 @@ import project.api.conceptual.EngineComputeAPIImpl;
 import project.api.network.NetworkService;
 import project.api.network.NetworkServiceImpl;
 import project.api.process.DataIOService;
-import project.api.process.DataIOService.DataPointer;
-import project.api.process.DataIOService.DataReadRequest;
-import project.api.process.DataIOService.DataWriteRequest;
-import project.api.process.DataIOService.DataWriteResponse;
 import project.memory.InMemoryInputConfig;
 import project.memory.InMemoryOutputConfig;
 import project.memory.InMemoryDataIOService;
+import project.model.DelimiterSpec;
+import project.model.JobRequest;
+import project.model.JobResult;
 
 public class ComputeEngineIntegrationTest {
 
     @Test
-    public void testComputeEngineIntegration_noDelimiterSpecified() {
+    public void testNetworkIntegration_defaultDelimiters() {
 
-        InMemoryInputConfig inputConfig =
-                new InMemoryInputConfig(List.of(1, 10, 25));
-        InMemoryOutputConfig outputConfig = new InMemoryOutputConfig();
-        DataIOService dataStore =
-                new InMemoryDataIOService(inputConfig, outputConfig);
+        // ----- 1. Configure in-memory data sources -----
+        InMemoryInputConfig input = new InMemoryInputConfig(List.of(1, 10, 25));
+        InMemoryOutputConfig output = new InMemoryOutputConfig();
+        DataIOService dataIO = new InMemoryDataIOService(input, output);
 
-        // Required real implementations for Checkpoint 3
+        // ----- 2. Real implementations for integration -----
         EngineComputeAPI engine = new EngineComputeAPIImpl();
-        NetworkService network = new NetworkServiceImpl(dataStore, engine);
+        NetworkService network = new NetworkServiceImpl(dataIO, engine);
 
-        // Read
-        DataPointer srcPtr = new DataPointer() {
-            @Override
-            public String asString() {
-                return "in://memory";
-            }
-        };
+        // ----- 3. Build JobRequest (single API entry point) -----
+        JobRequest req = new JobRequest(
+                "in://memory",
+                "out://memory",
+                DelimiterSpec.defaults()
+        );
 
-        DataReadRequest readReq = new DataReadRequest() {
-            @Override
-            public DataPointer source() {
-                return srcPtr;
-            }
-        };
+        // ----- 4. Call ONLY the Network API -----
+        JobResult result = network.submitJob(req);
 
-        dataStore.read(readReq);
+        // ----- 5. Assertions: Network + Compute + DataIO worked together -----
+        assertNotNull(result);
+        assertTrue(result.isSuccess());
 
-        List<Integer> inputs = inputConfig.getInputValues();
+        // Expected formatted compute results
+        String expectedCombined = "1:-1;10:5;25:5";
+        assertEquals(expectedCombined, result.getResultText());
 
-        for (int value : inputs) {
-
-            EngineComputeAPI.ComputeRequest computeReq =
-                    new EngineComputeAPI.ComputeRequest() {
-                        @Override
-                        public int input() {
-                            return value;
-                        }
-
-                        @Override
-                        public String delimiter() {
-                            return null;
-                        }
-                    };
-
-            String formatted = engine.compute(computeReq).asFormatted();
-
-            DataPointer dstPtr = new DataPointer() {
-                @Override
-                public String asString() {
-                    return "out://memory";
-                }
-            };
-
-            DataWriteRequest writeReq =
-                    new DataWriteRequest() {
-                        @Override
-                        public DataPointer destination() {
-                            return dstPtr;
-                        }
-
-                        @Override
-                        public String payload() {
-                            return formatted;
-                        }
-                    };
-
-            DataWriteResponse writeRes = dataStore.write(writeReq);
-            assertTrue(writeRes.code().success());
-        }
-
-        List<String> expected =
-                List.of("1:-1", "10:5", "25:5");
-
-
-        assertEquals(expected, outputConfig.getOutputValues());
+        // Also check that DataIOService recorded each output correctly
+        List<String> expectedIndividual = List.of("1:-1", "10:5", "25:5");
+        assertEquals(expectedIndividual, output.getOutputValues());
     }
 }
