@@ -48,7 +48,9 @@ public class EngineComputeAPIImpl implements EngineComputeAPI {
 
     /** PRIVATE: no validation needed unless YOU choose to add some. */
     private int largestPrimeFactor(int n) {
-        if (n <= 1) return -1;
+        if (n <= 1) {
+            return -1;
+        }
 
         int maxPrime = -1;
 
@@ -64,9 +66,12 @@ public class EngineComputeAPIImpl implements EngineComputeAPI {
             }
         }
 
-        if (n > 2) maxPrime = n;
+        if (n > 2) {
+            maxPrime = n;
+        }
 
         return maxPrime;
     }
+
 }
 
