@@ -7,6 +7,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
 import project.api.process.DataIOService.DataPointer;
 import project.api.process.DataIOService.DataReadRequest;
 import project.api.process.DataIOService.DataReadResponse;
@@ -14,111 +15,137 @@ import project.api.process.DataIOService.DataWriteRequest;
 import project.api.process.DataIOService.DataWriteResponse;
 
 /**
- * This version reads integers from a user-specified file and writes result
- * strings back to a user-specified file. 
+ * Reads integers from a file and writes results back to a file.
+ * Updated with full validation + defensive exception handling for Checkpoint 5.
  */
 public class DataIOServiceImpl implements DataIOService {
 
-    /**
-     * Reads data from the file pointed to by request.source().
-     * Expected format: comma-separated integers on a single line.
-     */
-	@Override
-	public DataReadResponse read(DataReadRequest request) {
-	    if (request == null || request.source() == null) {
-	        return () -> List.of();
-	    }
-
-	    String path = request.source().asString();
-	    List<Integer> numbers = new ArrayList<>();
-
-	    try (BufferedReader reader = new BufferedReader(new FileReader(path))) {
-	        String line = reader.readLine();
-
-	        if (line != null) {
-	            line = line.trim();
-	            if (!line.isEmpty()) {
-	                for (String part : line.split(",")) {
-	                    try {
-	                        numbers.add(Integer.parseInt(part.trim()));
-	                    } catch (NumberFormatException e) {
-	                        // ignore bad integers OR handle differently if you want
-	                    }
-	                }
-	            }
-	        }
-
-	    } catch (IOException e) {
-	        return () -> List.of();   // return empty list on failure
-	    }
-
-	    List<Integer> finalList = numbers;
-	    return () -> finalList;
-	}
-
-
-    /**
-     * Writes a string payload to the destination file.
-     * For this project, multiple writes to the same file are appended as a single
-     * comma-separated line (no newlines), so Checkpoint4 can see all results
-     * on one line.
-     */
     @Override
-    public DataWriteResponse write(DataWriteRequest request) {
-        if (request == null || request.destination() == null) {
-            return basicFailure("Destination pointer was null.");
-        }
-
-        String path = request.destination().asString();
-        String payload = request.payload();
-        if (payload == null) {
-            payload = "";
-        }
-
-        java.io.File outFile = new java.io.File(path);
-
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(outFile, true))) {
-            // If the file already has content, separate entries with a comma.
-            if (outFile.exists() && outFile.length() > 0) {
-                writer.write(",");
+    public DataReadResponse read(DataReadRequest request) {
+        try {
+            // -------- VALIDATION --------
+            if (request == null) {
+                return emptyResponse();
+            }
+            if (request.source() == null) {
+                return emptyResponse();
             }
 
-            writer.write(payload);
-            // No newline: keep everything on a single comma-separated line.
+            String path = request.source().asString();
+            if (path == null || path.isBlank()) {
+                return emptyResponse();
+            }
 
-            return basicSuccess("Successfully wrote to file.");
-        } catch (IOException e) {
-            return basicFailure("Failed to write to file: " + e.getMessage());
+            // -------- READ FILE --------
+            List<Integer> numbers = new ArrayList<>();
+
+            try (BufferedReader reader = new BufferedReader(new FileReader(path))) {
+
+                String line = reader.readLine();
+                if (line != null) {
+                    line = line.trim();
+
+                    if (!line.isEmpty()) {
+                        for (String part : line.split(",")) {
+                            try {
+                                numbers.add(Integer.parseInt(part.trim()));
+                            } catch (NumberFormatException ignored) {
+                                // Bad integers are ignored by design.
+                            }
+                        }
+                    }
+                }
+
+            } catch (IOException e) {
+                // IO failure → safe empty list
+                return emptyResponse();
+            }
+
+            List<Integer> finalList = numbers;
+            return () -> finalList;
+
+        } catch (Exception e) {
+            // Hard failure isolation for Checkpoint 5
+            return emptyResponse();
         }
     }
 
 
-    // Helpers to build clean responses
+    @Override
+    public DataWriteResponse write(DataWriteRequest request) {
+        try {
+            // -------- VALIDATION --------
+            if (request == null) {
+                return basicFailure("Write request was null.");
+            }
+            if (request.destination() == null) {
+                return basicFailure("Destination pointer was null.");
+            }
+
+            String path = request.destination().asString();
+            if (path == null || path.isBlank()) {
+                return basicFailure("Invalid destination path.");
+            }
+
+            String payload = request.payload();
+            if (payload == null) {
+                // No validation needed — empty payload is allowed.
+                payload = "";
+            }
+
+            java.io.File outFile = new java.io.File(path);
+
+            // -------- WRITE FILE --------
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(outFile, true))) {
+                if (outFile.exists() && outFile.length() > 0) {
+                    writer.write(",");
+                }
+
+                writer.write(payload);
+                return basicSuccess("Successfully wrote to file.");
+
+            } catch (IOException e) {
+                return basicFailure("Failed to write to file: " + e.getMessage());
+            }
+
+        } catch (Exception e) {
+            // Catch-all unexpected failure
+            return basicFailure("Unexpected error: " + e.getMessage());
+        }
+    }
+
+
+    // -------- Helpers --------
+
+    private DataReadResponse emptyResponse() {
+        return () -> List.of();
+    }
+
     private DataWriteResponse basicSuccess(String msg) {
         return new DataWriteResponse() {
             @Override
-            public StatusCode code() { 
-            	return StatusCode.SUCCESS; 
-            	}
+            public StatusCode code() {
+                return StatusCode.SUCCESS;
+            }
 
             @Override
-            public String message() { 
-            	return msg; 
-            	}
+            public String message() {
+                return msg;
+            }
         };
     }
 
     private DataWriteResponse basicFailure(String msg) {
         return new DataWriteResponse() {
             @Override
-            public StatusCode code() { 
-            	return StatusCode.FAILURE; 
-            	}
+            public StatusCode code() {
+                return StatusCode.FAILURE;
+            }
 
             @Override
-            public String message() { 
-            	return msg; 
-            	}
+            public String message() {
+                return msg;
+            }
         };
     }
 }
