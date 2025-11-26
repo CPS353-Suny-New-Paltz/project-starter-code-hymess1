@@ -5,7 +5,8 @@ import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-
+import java.util.ArrayList;
+import java.util.List;
 import project.api.process.DataIOService.DataPointer;
 import project.api.process.DataIOService.DataReadRequest;
 import project.api.process.DataIOService.DataReadResponse;
@@ -22,30 +23,39 @@ public class DataIOServiceImpl implements DataIOService {
      * Reads data from the file pointed to by request.source().
      * Expected format: comma-separated integers on a single line.
      */
-    @Override
-    public DataReadResponse read(DataReadRequest request) {
-        if (request == null || request.source() == null) {
-            return () -> "";
-        }
+	@Override
+	public DataReadResponse read(DataReadRequest request) {
+	    if (request == null || request.source() == null) {
+	        return () -> List.of();
+	    }
 
-        String path = request.source().asString();
-        StringBuilder builder = new StringBuilder();
+	    String path = request.source().asString();
+	    List<Integer> numbers = new ArrayList<>();
 
-        try (BufferedReader reader = new BufferedReader(new FileReader(path))) {
-            String line = reader.readLine();
+	    try (BufferedReader reader = new BufferedReader(new FileReader(path))) {
+	        String line = reader.readLine();
 
-            // If the file is empty or doesn’t exist, return an empty payload
-            if (line != null) {
-                builder.append(line.trim());
-            }
+	        if (line != null) {
+	            line = line.trim();
+	            if (!line.isEmpty()) {
+	                for (String part : line.split(",")) {
+	                    try {
+	                        numbers.add(Integer.parseInt(part.trim()));
+	                    } catch (NumberFormatException e) {
+	                        // ignore bad integers OR handle differently if you want
+	                    }
+	                }
+	            }
+	        }
 
-        } catch (IOException e) {
-            return () -> "";
-        }
+	    } catch (IOException e) {
+	        return () -> List.of();   // return empty list on failure
+	    }
 
-        // DataReadResponse is a functional interface so lambda is allowed
-        return () -> builder.toString();
-    }
+	    List<Integer> finalList = numbers;
+	    return () -> finalList;
+	}
+
 
     /**
      * Writes a string payload to the destination file.

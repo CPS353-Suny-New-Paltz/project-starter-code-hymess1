@@ -1,5 +1,5 @@
 package project.api.process;
-
+import java.util.List;
 import project.annotations.ProcessAPI;
 
 /**
@@ -41,7 +41,7 @@ public interface DataIOService {
      * Response from a read operation.
      */
     interface DataReadResponse {
-        String payload(); // the retrieved data
+    	List<Integer> payload(); // the retrieved data
     }
 
     /**

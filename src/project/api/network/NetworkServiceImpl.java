@@ -57,20 +57,13 @@ public class NetworkServiceImpl implements NetworkService {
             return new JobResult(false, "", "Failed to read input.");
         }
 
-        String payload = readRes.payload().trim();
-        if (payload.isEmpty()) {
+     // Payload is now a List<Integer>
+        List<Integer> inputs = readRes.payload();
+
+        if (inputs == null || inputs.isEmpty()) {
             return new JobResult(false, "", "No input values found.");
         }
 
-        // Parse the comma-separated list of integers from the storage layer
-        List<Integer> inputs = new ArrayList<>();
-        try {
-            for (String piece : payload.split(",")) {
-                inputs.add(Integer.parseInt(piece.trim()));
-            }
-        } catch (NumberFormatException e) {
-            return new JobResult(false, "", "Input contained non-integer values.");
-        }
 
         // Another DataPointer, this time for where results get written.
         //really just a shorter way of writing:
