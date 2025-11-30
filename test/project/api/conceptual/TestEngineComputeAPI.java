@@ -1,6 +1,6 @@
 package project.api.conceptual;
 
-import static org.junit.jupiter.api.Assertions.fail;
+import org.junit.jupiter.api.Assertions;
 
 import org.junit.jupiter.api.Test;
 
@@ -12,7 +12,7 @@ public class TestEngineComputeAPI {
 
     @Test
     public void smokeTest_computeRuns() {
-        try {
+        
             // Create the API implementation to test
             EngineComputeAPI api = new EngineComputeAPIImpl();
 
@@ -32,13 +32,13 @@ public class TestEngineComputeAPI {
             // Call the compute method
             EngineComputeAPI.ComputeResponse res = api.compute(req);
 
-            // Validate the response object
-            if (res == null || res.asFormatted() == null) {
-                fail("compute() returned null or incomplete response");
-            }
-
-        } catch (Exception e) {
-            fail("compute() threw an unexpected exception: " + e.getMessage());
-        }
+            Assertions.assertNotNull(res, "compute() returned null response");
+            
+            String formatted = res.asFormatted();
+            Assertions.assertNotNull(formatted, "asFormatted( returned null:");
+            
+            //Expected behavior
+            Assertions.assertEquals("5:5", formatted);
+       
     }
 }
