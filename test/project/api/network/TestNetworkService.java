@@ -30,7 +30,7 @@ public class TestNetworkService {
             
             //Mock read() return 5
             DataReadResponse goodRead = Mockito.mock(DataReadResponse.class);
-            Mockito.when(goodRead.payload()).thenReturn(List.Of(5));
+            Mockito.when(goodRead.payload()).thenReturn(List.of(5));
             Mockito.when(mockIO.read(Mockito.any(DataReadRequest.class))).thenReturn(goodRead);
             
             // Pretend every write succeeds.
