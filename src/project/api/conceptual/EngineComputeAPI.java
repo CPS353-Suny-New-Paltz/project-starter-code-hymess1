@@ -19,37 +19,68 @@ public interface EngineComputeAPI {
      * primary method. Never returns null.
      */
     default ComputeResponse computeSingle(int n, String keyValueDelimiter) {
-        return compute(new ComputeRequest() {
-            @Override
-            public int input() {
-                return n;
-            }
+        return compute(
+            new ComputeRequest() {
+                @Override
+                public int input() {
+                    return n;
+                }
 
-            @Override
-            public String delimiter() {
-                return keyValueDelimiter;
+                @Override
+                public String delimiter() {
+                    return keyValueDelimiter;
+                }
             }
-        });
+        );
     }
 
-    /**
-     * Request wrapper for conceptual compute. (Interfaces nested to avoid extra
-     * files for the prototype phase.)
-     */
     interface ComputeRequest {
         int input();
-
         String delimiter();
     }
 
+    
     /**
-     * Response wrapper for conceptual compute. Callers can render to text or
-     * inspect fields. Never implemented here (prototype phase only).
+     * Response wrapper for conceptual compute.
+     * Callers can render to text or inspect fields. Never null.
      */
     interface ComputeResponse {
+
         /**
-         * Human-readable representation like "n:result". Never null.
+         * Status of the compute operation.
+         */
+        ComputeStatusCode status();
+
+        /**
+         * Human-readable representation like "n:result".
+         * Only meaningful when status().success() is true.
          */
         String asFormatted();
+
+        /**
+         * Convenience helper so callers can just ask "did this work?".
+         */
+        default boolean success() {
+            return status().success();
+        }
+    }
+
+    /**
+     * Status code for compute operations.
+     */
+    enum ComputeStatusCode {
+        SUCCESS(true),
+        INVALID_INPUT(false),
+        INTERNAL_ERROR(false);
+
+        private final boolean success;
+
+        ComputeStatusCode(boolean success) {
+            this.success = success;
+        }
+
+        public boolean success() {
+            return success;
+        }
     }
 }
