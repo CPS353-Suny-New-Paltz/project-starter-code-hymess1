@@ -28,6 +28,7 @@ public class TestUser {
                 new DelimiterSpec(false, String.valueOf(delimiter), ":");
         JobRequest request = new JobRequest(inputPath, outputPath, delims);
         JobResult result = coordinator.submitJob(request);
+        
         // Fail if something went wrong
         if (result == null || !result.isSuccess()) {
             String msg = (result == null)
@@ -35,6 +36,7 @@ public class TestUser {
                     : result.getErrorMessage();
             throw new IllegalStateException("Job failed: " + msg);
         }
+        
 	}
 
 }
