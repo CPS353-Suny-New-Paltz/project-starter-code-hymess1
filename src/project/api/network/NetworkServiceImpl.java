@@ -15,8 +15,8 @@ import java.util.List;
 
 public class NetworkServiceImpl implements NetworkService {
 
-    private final DataIOService dataIO;
-    private final EngineComputeAPI computeEngine;
+    protected final DataIOService dataIO;
+    protected final EngineComputeAPI computeEngine;
 
     /**
      * The network layer depends on the data storage component and
@@ -105,102 +105,11 @@ public class NetworkServiceImpl implements NetworkService {
 
             // ---------- PREPARE OUTPUT POINTER ----------
             DataPointer outputPtr = () -> outPtrString;
-            List<String> writtenResults = new ArrayList<>();
 
-            // ---------- PROCESS EACH INPUT ----------
-            for (int value : inputs) {
-
-                // Validate each value
-                if (value < 0) {
-                    return new JobResult(
-                        false,
-                        "",
-                        "Negative input encountered."
-                    );
-                }
-
-                // Build conceptual compute request
-                EngineComputeAPI.ComputeRequest computeReq =
-                    new EngineComputeAPI.ComputeRequest() {
-                        @Override
-                        public int input() {
-                            return value;
-                        }
-
-                        @Override
-                        public String delimiter() {
-                            return request
-                                .getDelimiterSpec()
-                                .getKeyValueDelimiter();
-                        }
-                    };
-
-                EngineComputeAPI.ComputeResponse computeRes =
-                    computeEngine.compute(computeReq);
-
-                // Notice errors from EngineComputeAPI
-                if (computeRes == null || !computeRes.success()) {
-                    String msg;
-
-                    if (computeRes == null) {
-                        msg = "Compute engine returned null response.";
-                    } else {
-                        switch (computeRes.status()) {
-                            case INVALID_INPUT:
-                                msg = "Invalid input encountered in compute "
-                                    + "engine for value " + value;
-                                break;
-                            case INTERNAL_ERROR:
-                                msg = "Internal compute error for value "
-                                    + value;
-                                break;
-                            case SUCCESS:
-                            default:
-                                msg = "Unexpected compute status.";
-                                break;
-                        }
-                    }
-
-                    return new JobResult(false, "", msg);
-                }
-
-                String formatted = computeRes.asFormatted();
-
-                // Write result out
-                DataWriteRequest writeReq = new DataWriteRequest() {
-                    @Override
-                    public DataPointer destination() {
-                        return outputPtr;
-                    }
-
-                    @Override
-                    public String payload() {
-                        return formatted;
-                    }
-                };
-
-                DataWriteResponse writeRes = dataIO.write(writeReq);
-                if (writeRes == null || !writeRes.code().success()) {
-                    return new JobResult(
-                        false,
-                        "",
-                        "Failed to write output."
-                    );
-                }
-
-                writtenResults.add(formatted);
-            }
-
-            // ---------- COMBINE RESULTS ----------
-            String combined = String.join(
-                request.getDelimiterSpec().getPairDelimiter(),
-                writtenResults
-            );
-
-            return new JobResult(true, combined, "");
+            // ---------- DELEGATE TO HOOK ----------
+            return processInputs(request, inputs, outputPtr);
 
         } catch (Exception e) {
-            // ---------- REQUIRED BY CHECKPOINT 5 ----------
             return new JobResult(
                 false,
                 "",
@@ -208,4 +117,108 @@ public class NetworkServiceImpl implements NetworkService {
             );
         }
     }
+    /**
+     * Hook for processing all inputs in a job.
+     * Default implementation is single-threaded.
+     * Subclasses (like multi-threaded) can override this.
+     */
+    protected JobResult processInputs(
+        JobRequest request,
+        List<Integer> inputs,
+        DataPointer outputPtr
+    ) {
+        List<String> writtenResults = new ArrayList<>();
+
+        for (int value : inputs) {
+
+            // Validate each value
+            if (value < 0) {
+                return new JobResult(
+                    false,
+                    "",
+                    "Negative input encountered."
+                );
+            }
+
+            // Build conceptual compute request
+            EngineComputeAPI.ComputeRequest computeReq =
+                new EngineComputeAPI.ComputeRequest() {
+                    @Override
+                    public int input() {
+                        return value;
+                    }
+
+                    @Override
+                    public String delimiter() {
+                        return request
+                            .getDelimiterSpec()
+                            .getKeyValueDelimiter();
+                    }
+                };
+
+            EngineComputeAPI.ComputeResponse computeRes =
+                computeEngine.compute(computeReq);
+
+            // Notice errors from EngineComputeAPI
+            if (computeRes == null || !computeRes.success()) {
+                String msg;
+
+                if (computeRes == null) {
+                    msg = "Compute engine returned null response.";
+                } else {
+                    switch (computeRes.status()) {
+                        case INVALID_INPUT:
+                            msg = "Invalid input encountered in compute "
+                                + "engine for value " + value;
+                            break;
+                        case INTERNAL_ERROR:
+                            msg = "Internal compute error for value "
+                                + value;
+                            break;
+                        case SUCCESS:
+                        default:
+                            msg = "Unexpected compute status.";
+                            break;
+                    }
+                }
+
+                return new JobResult(false, "", msg);
+            }
+
+            String formatted = computeRes.asFormatted();
+
+            // Write result out
+            DataWriteRequest writeReq = new DataWriteRequest() {
+                @Override
+                public DataPointer destination() {
+                    return outputPtr;
+                }
+
+                @Override
+                public String payload() {
+                    return formatted;
+                }
+            };
+
+            DataWriteResponse writeRes = dataIO.write(writeReq);
+            if (writeRes == null || !writeRes.code().success()) {
+                return new JobResult(
+                    false,
+                    "",
+                    "Failed to write output."
+                );
+            }
+
+            writtenResults.add(formatted);
+        }
+
+        // ---------- COMBINE RESULTS ----------
+        String combined = String.join(
+            request.getDelimiterSpec().getPairDelimiter(),
+            writtenResults
+        );
+
+        return new JobResult(true, combined, "");
+    }
+
 }
