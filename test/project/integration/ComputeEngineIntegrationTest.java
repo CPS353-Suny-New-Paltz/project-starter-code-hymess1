@@ -12,6 +12,7 @@ import project.api.conceptual.EngineComputeAPI;
 import project.api.conceptual.EngineComputeAPIImpl;
 import project.api.network.NetworkService;
 import project.api.network.NetworkServiceImpl;
+import project.api.network.MultithreadedNetworkService;
 import project.api.process.DataIOService;
 import project.memory.InMemoryInputConfig;
 import project.memory.InMemoryOutputConfig;
