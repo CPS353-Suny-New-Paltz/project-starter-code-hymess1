@@ -36,10 +36,10 @@ public interface EngineComputeAPI {
 
     interface ComputeRequest {
         int input();
+
         String delimiter();
     }
 
-    
     /**
      * Response wrapper for conceptual compute.
      * Callers can render to text or inspect fields. Never null.
