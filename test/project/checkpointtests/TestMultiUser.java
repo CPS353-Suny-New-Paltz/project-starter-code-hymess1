@@ -9,7 +9,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import org.junit.Assertions;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -84,7 +84,7 @@ public class TestMultiUser {
 
 	private List<String> loadAllOutput(String prefix, int numThreads) throws IOException {
 		List<String> result = new ArrayList<>();
-		for (int i = 0; i < nThreads; i++) {
+		for (int i = 0; i < numThreads; i++) {
 			File multiThreadedOut = 
 					new File(prefix + i);
 			result.addAll(Files.readAllLines(multiThreadedOut.toPath()));
