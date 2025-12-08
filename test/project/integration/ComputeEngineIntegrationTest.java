@@ -34,7 +34,9 @@ public class ComputeEngineIntegrationTest {
 
         // ----- 2. Real implementations for integration -----
         EngineComputeAPI engine = new EngineComputeAPIImpl();
-        NetworkService network = new NetworkServiceImpl(dataIO, engine);
+        int maxThreads = 4; // same upper bound you use elsewhere
+        NetworkService network =
+                new MultithreadedNetworkService(dataIO, engine, maxThreads);
 
         // ----- 3. Build JobRequest (single API entry point) -----
         JobRequest req = new JobRequest(
