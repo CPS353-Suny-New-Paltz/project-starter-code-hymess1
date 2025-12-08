@@ -1,6 +1,5 @@
 package project.checkpointtests;
 
-import API_Package.MultithreadedNetworkAPI;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -14,25 +13,30 @@ import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import project.api.conceptual.EngineComputeAPI;
+import project.api.conceptual.EngineComputeAPIImpl;
+import project.api.network.NetworkService;
+import project.api.network.NetworkServiceImpl;
+import project.api.process.DataIOService;
+import project.api.process.DataIOServiceImpl;
+
 public class TestMultiUser {
 	
 	// TODO 1: change the type of this variable to the name you're using for your @NetworkAPI
 	// interface
-	private ComputationCoordinator coordinator;
-	private MultithreadedNetworkAPI networkAPI;
+	private NetworkService coordinator;
 	
 	@BeforeEach
 	public void initializeComputeEngine() {
-		networkAPI = new MultithreadedNetworkAPI();
 		//TODO 2: create an instance of the implementation of your @NetworkAPI; this is the component
 		// that the user will make requests to
 		// Store it in the 'coordinator' instance variable
+        DataIOService dataIO = new DataIOServiceImpl();
+        EngineComputeAPI engine = new EngineComputeAPIImpl();
+        coordinator = new NetworkServiceImpl(dataIO, engine);
+
 	}
-	public void cleanup() {
-        if (networkAPI != null) {
-            networkAPI.shutdown();
-        }
-    }
+	
 	@Test
 	public void compareMultiAndSingleThreaded() throws Exception {
 		int nThreads = 4;
