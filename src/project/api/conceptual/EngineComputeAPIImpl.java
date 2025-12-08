@@ -2,6 +2,8 @@ package project.api.conceptual;
 
 import project.api.conceptual.EngineComputeAPI.ComputeRequest;
 import project.api.conceptual.EngineComputeAPI.ComputeResponse;
+import project.api.conceptual.EngineComputeAPI.ComputeStatusCode;
+
 
 /**
  * Implementation of the conceptual compute API.
@@ -13,37 +15,80 @@ public class EngineComputeAPIImpl implements EngineComputeAPI {
     @Override
     public ComputeResponse compute(ComputeRequest request) {
         try {
-            // ----- VALIDATION -----
+        	// ----- VALIDATION -----
             if (request == null) {
-                return error("request was null");
+                return error(
+                    ComputeStatusCode.INVALID_INPUT,
+                    "request was null"
+                );
             }
 
             String delimiter = request.delimiter();
             if (delimiter == null || delimiter.isBlank()) {
-                return error("delimiter was null or blank");
+                return error(
+                    ComputeStatusCode.INVALID_INPUT,
+                    "delimiter was null or blank"
+                );
             }
 
             int n = request.input();
             if (n < 0) {
-                return error("input must be non-negative");
+                return error(
+                    ComputeStatusCode.INVALID_INPUT,
+                    "input must be non-negative"
+                );
             }
 
             // ----- NORMAL EXECUTION -----
             int result = largestPrimeFactor(n);
             String formatted = n + delimiter + result;
 
-            return () -> formatted;
+            return success(formatted);
 
         } catch (Exception ex) {
             // ----- EXCEPTION TRANSLATION -----
-            return error("unexpected exception: " + ex.getMessage());
+        	return error(
+                    ComputeStatusCode.INTERNAL_ERROR,
+                    "unexpected exception: " + ex.getMessage()
+                );
+            }
         }
-    }
+    /**
+     * Helper: success response wrapper.
+     */
+    private ComputeResponse success(final String formatted) {
+        return new ComputeResponse() {
+            @Override
+            public ComputeStatusCode status() {
+                return ComputeStatusCode.SUCCESS;
+            }
 
-    /** Helper: wrap error messages in a ComputeResponse sentinel. */
-    private ComputeResponse error(String msg) {
+            @Override
+            public String asFormatted() {
+                return formatted;
+            }
+        };
+    }
+    
+    /**
+     * Helper: error response wrapper with status + message.
+     */
+    private ComputeResponse error(
+        final ComputeStatusCode code,
+        final String msg
+    ) {
         final String formatted = "error:" + msg;
-        return () -> formatted;
+        return new ComputeResponse() {
+            @Override
+            public ComputeStatusCode status() {
+                return code;
+            }
+
+            @Override
+            public String asFormatted() {
+                return formatted;
+            }
+        };
     }
 
     /** PRIVATE: no validation needed unless YOU choose to add some. */

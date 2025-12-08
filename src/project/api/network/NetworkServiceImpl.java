@@ -22,7 +22,10 @@ public class NetworkServiceImpl implements NetworkService {
      * The network layer depends on the data storage component and
      * the compute engine. Keep references to both.
      */
-    public NetworkServiceImpl(DataIOService dataIO, EngineComputeAPI computeEngine) {
+    public NetworkServiceImpl(
+        DataIOService dataIO,
+        EngineComputeAPI computeEngine
+    ) {
         this.dataIO = dataIO;
         this.computeEngine = computeEngine;
     }
@@ -33,29 +36,49 @@ public class NetworkServiceImpl implements NetworkService {
 
             // ---------- VALIDATION ----------
             if (request == null) {
-                return new JobResult(false, "", "No job request was provided.");
+                return new JobResult(
+                    false,
+                    "",
+                    "No job request was provided."
+                );
             }
 
             // Validate input pointer
             String inPtrString = request.getInputSourcePointer();
             if (inPtrString == null || inPtrString.isBlank()) {
-                return new JobResult(false, "", "Invalid input pointer.");
+                return new JobResult(
+                    false,
+                    "",
+                    "Invalid input pointer."
+                );
             }
 
             // Validate output pointer
             String outPtrString = request.getOutputDestinationPointer();
             if (outPtrString == null || outPtrString.isBlank()) {
-                return new JobResult(false, "", "Invalid output pointer.");
+                return new JobResult(
+                    false,
+                    "",
+                    "Invalid output pointer."
+                );
             }
 
             // Validate delimiter spec
-            if (request.getDelimiterSpec() == null ||
-                request.getDelimiterSpec().getKeyValueDelimiter() == null ||
-                request.getDelimiterSpec().getKeyValueDelimiter().isBlank() ||
-                request.getDelimiterSpec().getPairDelimiter() == null ||
-                request.getDelimiterSpec().getPairDelimiter().isBlank()) {
+            if (request.getDelimiterSpec() == null
+                || request.getDelimiterSpec().getKeyValueDelimiter() == null
+                || request.getDelimiterSpec()
+                    .getKeyValueDelimiter()
+                    .isBlank()
+                || request.getDelimiterSpec().getPairDelimiter() == null
+                || request.getDelimiterSpec()
+                    .getPairDelimiter()
+                    .isBlank()) {
 
-                return new JobResult(false, "", "Invalid delimiter specification.");
+                return new JobResult(
+                    false,
+                    "",
+                    "Invalid delimiter specification."
+                );
             }
 
             // ---------- READ INPUT ----------
@@ -64,12 +87,20 @@ public class NetworkServiceImpl implements NetworkService {
 
             DataReadResponse readRes = dataIO.read(readReq);
             if (readRes == null || readRes.payload() == null) {
-                return new JobResult(false, "", "Failed to read input.");
+                return new JobResult(
+                    false,
+                    "",
+                    "Failed to read input."
+                );
             }
 
             List<Integer> inputs = readRes.payload();
             if (inputs.isEmpty()) {
-                return new JobResult(false, "", "No input values found.");
+                return new JobResult(
+                    false,
+                    "",
+                    "No input values found."
+                );
             }
 
             // ---------- PREPARE OUTPUT POINTER ----------
@@ -81,23 +112,59 @@ public class NetworkServiceImpl implements NetworkService {
 
                 // Validate each value
                 if (value < 0) {
-                    return new JobResult(false, "", "Negative input encountered.");
+                    return new JobResult(
+                        false,
+                        "",
+                        "Negative input encountered."
+                    );
                 }
 
                 // Build conceptual compute request
-                var computeReq = new EngineComputeAPI.ComputeRequest() {
-                    @Override
-                    public int input() {
-                        return value;
+                EngineComputeAPI.ComputeRequest computeReq =
+                    new EngineComputeAPI.ComputeRequest() {
+                        @Override
+                        public int input() {
+                            return value;
+                        }
+
+                        @Override
+                        public String delimiter() {
+                            return request
+                                .getDelimiterSpec()
+                                .getKeyValueDelimiter();
+                        }
+                    };
+
+                EngineComputeAPI.ComputeResponse computeRes =
+                    computeEngine.compute(computeReq);
+
+                // Notice errors from EngineComputeAPI
+                if (computeRes == null || !computeRes.success()) {
+                    String msg;
+
+                    if (computeRes == null) {
+                        msg = "Compute engine returned null response.";
+                    } else {
+                        switch (computeRes.status()) {
+                            case INVALID_INPUT:
+                                msg = "Invalid input encountered in compute "
+                                    + "engine for value " + value;
+                                break;
+                            case INTERNAL_ERROR:
+                                msg = "Internal compute error for value "
+                                    + value;
+                                break;
+                            case SUCCESS:
+                            default:
+                                msg = "Unexpected compute status.";
+                                break;
+                        }
                     }
 
-                    @Override
-                    public String delimiter() {
-                        return request.getDelimiterSpec().getKeyValueDelimiter();
-                    }
-                };
+                    return new JobResult(false, "", msg);
+                }
 
-                String formatted = computeEngine.compute(computeReq).asFormatted();
+                String formatted = computeRes.asFormatted();
 
                 // Write result out
                 DataWriteRequest writeReq = new DataWriteRequest() {
@@ -114,7 +181,11 @@ public class NetworkServiceImpl implements NetworkService {
 
                 DataWriteResponse writeRes = dataIO.write(writeReq);
                 if (writeRes == null || !writeRes.code().success()) {
-                    return new JobResult(false, "", "Failed to write output.");
+                    return new JobResult(
+                        false,
+                        "",
+                        "Failed to write output."
+                    );
                 }
 
                 writtenResults.add(formatted);
@@ -122,15 +193,19 @@ public class NetworkServiceImpl implements NetworkService {
 
             // ---------- COMBINE RESULTS ----------
             String combined = String.join(
-                    request.getDelimiterSpec().getPairDelimiter(),
-                    writtenResults
+                request.getDelimiterSpec().getPairDelimiter(),
+                writtenResults
             );
 
             return new JobResult(true, combined, "");
 
         } catch (Exception e) {
             // ---------- REQUIRED BY CHECKPOINT 5 ----------
-            return new JobResult(false, "", "Unexpected error: " + e.getMessage());
+            return new JobResult(
+                false,
+                "",
+                "Unexpected error: " + e.getMessage()
+            );
         }
     }
 }
