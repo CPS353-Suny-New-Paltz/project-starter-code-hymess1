@@ -16,7 +16,7 @@ import org.junit.jupiter.api.Test;
 import project.api.conceptual.EngineComputeAPI;
 import project.api.conceptual.EngineComputeAPIImpl;
 import project.api.network.NetworkService;
-import project.api.network.NetworkServiceImpl;
+import project.api.network.MultithreadedNetworkService;
 import project.api.process.DataIOService;
 import project.api.process.DataIOServiceImpl;
 
@@ -33,7 +33,8 @@ public class TestMultiUser {
 		// Store it in the 'coordinator' instance variable
         DataIOService dataIO = new DataIOServiceImpl();
         EngineComputeAPI engine = new EngineComputeAPIImpl();
-        coordinator = new NetworkServiceImpl(dataIO, engine);
+        int maxThreads = 4;
+        coordinator = new MultithreadedNetworkService(dataIO, engine, maxThreads);
 
 	}
 	
