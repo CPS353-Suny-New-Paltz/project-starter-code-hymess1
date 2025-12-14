@@ -1,1 +1,23 @@
+syntax = "proto3";
 
+package network;
+
+// gRPC service 
+service NetworkService {
+  rpc SubmitJob (JobRequest) returns (JobResult);
+}
+
+// For project.model.JobRequest
+message JobRequest {
+  string inputSourcePointer = 1;
+  string outputDestinationPointer = 2;
+  string pairDelimiter = 3;
+  string keyValueDelimiter = 4;
+}
+
+// For project.model.JobResult
+message JobResult {
+  bool success = 1;
+  string resultText = 2;
+  string errorMessage = 3;
+}
