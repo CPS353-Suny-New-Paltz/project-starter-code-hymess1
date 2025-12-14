@@ -20,8 +20,8 @@ public class NetworkGrpcServer extends NetworkServiceGrpc.NetworkServiceImplBase
 
     @Override
     public void submitJob(
-            Network.JobRequest request,
-            StreamObserver<Network.JobResult> responseObserver) {
+            network.Network.JobRequest request,
+            StreamObserver<network.Network.JobResult> responseObserver) {
 
         try {
             // ---- proto to model ----
@@ -43,7 +43,7 @@ public class NetworkGrpcServer extends NetworkServiceGrpc.NetworkServiceImplBase
                     networkService.submitJob(modelReq);
 
             // ---- model to proto ----
-            Network.JobResult grpcRes =
+            network.Network.JobResult grpcRes =
                     Network.JobResult.newBuilder()
                             .setSuccess(modelRes.isSuccess())
                             .setResultText(modelRes.getResultText())
@@ -54,7 +54,7 @@ public class NetworkGrpcServer extends NetworkServiceGrpc.NetworkServiceImplBase
             responseObserver.onCompleted();
 
         } catch (Exception e) {
-            Network.JobResult error =
+            network.Network.JobResult error =
                     Network.JobResult.newBuilder()
                             .setSuccess(false)
                             .setResultText("")

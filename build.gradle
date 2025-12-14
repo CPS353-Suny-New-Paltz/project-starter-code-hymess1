@@ -17,6 +17,9 @@ sourceSets {
                 "$buildDir/generated/source/proto/main/grpc"
             ]
         }
+        proto {
+            srcDir 'src/main/proto'
+        }
     }
     test {
         java {

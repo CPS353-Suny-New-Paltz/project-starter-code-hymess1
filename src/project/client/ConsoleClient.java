@@ -109,7 +109,7 @@ public class ConsoleClient {
                         .build();
 
         // ---------- SUBMIT JOB ----------
-        Network.JobResult result;
+        network.Network.JobResult result;
         try {
             result = stub.submitJob(request);
         } catch (Exception e) {
