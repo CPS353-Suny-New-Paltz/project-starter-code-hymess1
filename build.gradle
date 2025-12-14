@@ -1,6 +1,9 @@
-apply plugin: 'java'
-apply plugin: 'eclipse'
-apply plugin: 'com.google.protobuf'
+plugins {
+    id 'java'
+    id 'eclipse'
+    id 'com.google.protobuf' version '0.9.4'
+}
+
 
 eclipse.project.name = 'Sack Project' 
 
