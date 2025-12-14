@@ -4,16 +4,12 @@ import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import io.grpc.stub.StreamObserver;
 
+import network.Network;
 import network.NetworkServiceGrpc;
-import network.JobRequest;
-import network.JobResult;
 
 import project.api.network.NetworkService;
 import project.model.DelimiterSpec;
 
-
- // Turns gRPC requests into NetworkService calls.
- 
 public class NetworkGrpcServer extends NetworkServiceGrpc.NetworkServiceImplBase {
 
     private final NetworkService networkService;
@@ -24,67 +20,63 @@ public class NetworkGrpcServer extends NetworkServiceGrpc.NetworkServiceImplBase
 
     @Override
     public void submitJob(
-        JobRequest request,
-        StreamObserver<JobResult> responseObserver
-    ) {
+            Network.JobRequest request,
+            StreamObserver<Network.JobResult> responseObserver) {
+
         try {
-            // ---------- Convert proto to model ----------
+            // ---- proto to model ----
             DelimiterSpec delims = new DelimiterSpec(
-                false,
-                request.getPairDelimiter(),
-                request.getKeyValueDelimiter()
+                    false,
+                    request.getPairDelimiter(),
+                    request.getKeyValueDelimiter()
             );
 
             project.model.JobRequest modelReq =
-                new project.model.JobRequest(
-                    request.getInputSourcePointer(),
-                    request.getOutputDestinationPointer(),
-                    delims
-                );
+                    new project.model.JobRequest(
+                            request.getInputSourcePointer(),
+                            request.getOutputDestinationPointer(),
+                            delims
+                    );
 
-            // ---------- Call NetworkService ----------
+            // ---- call NetworkService ----
             project.model.JobResult modelRes =
-                networkService.submitJob(modelReq);
+                    networkService.submitJob(modelReq);
 
-            // ---------- Convert model to proto ----------
-            JobResult grpcRes = JobResult.newBuilder()
-                .setSuccess(modelRes.isSuccess())
-                .setResultText(modelRes.getResultText())
-                .setErrorMessage(modelRes.getErrorMessage())
-                .build();
+            // ---- model to proto ----
+            Network.JobResult grpcRes =
+                    Network.JobResult.newBuilder()
+                            .setSuccess(modelRes.isSuccess())
+                            .setResultText(modelRes.getResultText())
+                            .setErrorMessage(modelRes.getErrorMessage())
+                            .build();
 
             responseObserver.onNext(grpcRes);
             responseObserver.onCompleted();
 
         } catch (Exception e) {
-            // gRPC boundary shouldn't throw
-            JobResult error = JobResult.newBuilder()
-                .setSuccess(false)
-                .setResultText("")
-                .setErrorMessage("Unexpected server error: " + e.getMessage())
-                .build();
+            Network.JobResult error =
+                    Network.JobResult.newBuilder()
+                            .setSuccess(false)
+                            .setResultText("")
+                            .setErrorMessage("Unexpected server error: " + e.getMessage())
+                            .build();
 
             responseObserver.onNext(error);
             responseObserver.onCompleted();
         }
     }
 
-    
-     // start a gRPC server.
-     
     public static Server startServer(
-        int port,
-        NetworkService networkService
-    ) throws Exception {
+            int port,
+            NetworkService networkService) throws Exception {
 
         Server server = ServerBuilder
-            .forPort(port)
-            .addService(new NetworkGrpcServer(networkService))
-            .build()
-            .start();
+                .forPort(port)
+                .addService(new NetworkGrpcServer(networkService))
+                .build()
+                .start();
 
         System.out.println("Network gRPC server started on port " + port);
-
         return server;
     }
 }
