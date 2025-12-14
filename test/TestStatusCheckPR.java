@@ -48,7 +48,7 @@ public class TestStatusCheckPR {
     
     // query the git remote to find the repo URL
     private String getBaseApiPath() throws Exception {
-        Process getRemote = new ProcessBuilder("git", "remote",  "get-url", "origin", "--push").start();
+        java.lang.Process getRemote = new ProcessBuilder("git", "remote",  "get-url", "origin", "--push").start();
         getRemote.waitFor();
         String output = new String(getRemote.getInputStream().readAllBytes());
         String ownerRepo = output.substring("https://github.com/".length());
