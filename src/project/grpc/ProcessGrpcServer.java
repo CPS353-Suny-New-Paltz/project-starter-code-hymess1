@@ -4,18 +4,17 @@ import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import io.grpc.stub.StreamObserver;
 
-import process.Process;
-import process.ProcessServiceGrpc;
+import project.grpc.process.ProcessProto;
+import project.grpc.process.ProcessServiceGrpc;
 
 import project.api.process.DataIOService;
-import project.api.process.DataIOService.DataReadRequest;
 import project.api.process.DataIOService.DataWriteRequest;
 
-
-  //gRPC server for the Process API.
- 
- // Bridges proto requests to a DataIOService implementation.
- 
+/**
+ * gRPC server for the Process API.
+ *
+ * Bridges proto requests to a DataIOService implementation.
+ */
 public class ProcessGrpcServer extends ProcessServiceGrpc.ProcessServiceImplBase {
 
     private final DataIOService dataIO;
@@ -26,14 +25,14 @@ public class ProcessGrpcServer extends ProcessServiceGrpc.ProcessServiceImplBase
 
     @Override
     public void read(
-            Process.ReadRequest request,
-            StreamObserver<Process.ReadResponse> responseObserver) {
+            ProcessProto.ReadRequest request,
+            StreamObserver<ProcessProto.ReadResponse> responseObserver) {
 
         try {
             var res = dataIO.read(() -> () -> request.getSourcePointer());
 
-            Process.ReadResponse grpcRes =
-                    Process.ReadResponse.newBuilder()
+            ProcessProto.ReadResponse grpcRes =
+                    ProcessProto.ReadResponse.newBuilder()
                             .addAllValues(res.payload())
                             .build();
 
@@ -42,7 +41,7 @@ public class ProcessGrpcServer extends ProcessServiceGrpc.ProcessServiceImplBase
 
         } catch (Exception e) {
             responseObserver.onNext(
-                    Process.ReadResponse.newBuilder().build()
+                    ProcessProto.ReadResponse.newBuilder().build()
             );
             responseObserver.onCompleted();
         }
@@ -50,8 +49,8 @@ public class ProcessGrpcServer extends ProcessServiceGrpc.ProcessServiceImplBase
 
     @Override
     public void write(
-            Process.WriteRequest request,
-            StreamObserver<Process.WriteResponse> responseObserver) {
+            ProcessProto.WriteRequest request,
+            StreamObserver<ProcessProto.WriteResponse> responseObserver) {
 
         try {
             var res = dataIO.write(new DataWriteRequest() {
@@ -66,9 +65,13 @@ public class ProcessGrpcServer extends ProcessServiceGrpc.ProcessServiceImplBase
                 }
             });
 
-            Process.WriteResponse grpcRes =
-                    Process.WriteResponse.newBuilder()
-                            .setSuccess(res.code().success())
+            ProcessProto.WriteResponse grpcRes =
+                    ProcessProto.WriteResponse.newBuilder()
+                            .setCode(
+                                res.code() == DataIOService.DataWriteResponse.StatusCode.SUCCESS
+                                    ? ProcessProto.StatusCode.SUCCESS
+                                    : ProcessProto.StatusCode.FAILURE
+                            )
                             .setMessage(res.message())
                             .build();
 
@@ -77,8 +80,8 @@ public class ProcessGrpcServer extends ProcessServiceGrpc.ProcessServiceImplBase
 
         } catch (Exception e) {
             responseObserver.onNext(
-                    Process.WriteResponse.newBuilder()
-                            .setSuccess(false)
+                    ProcessProto.WriteResponse.newBuilder()
+                            .setCode(ProcessProto.StatusCode.FAILURE)
                             .setMessage("Unexpected error: " + e.getMessage())
                             .build()
             );
