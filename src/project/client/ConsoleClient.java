@@ -9,8 +9,8 @@ import java.io.FileWriter;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 
-import network.Network;
-import network.NetworkServiceGrpc;
+import project.grpc.network.NetworkProto;
+import project.grpc.network.NetworkServiceGrpc;
 
 /**
  * Console-based gRPC client for the compute engine.
@@ -100,8 +100,8 @@ public class ConsoleClient {
         }
 
         // ---------- BUILD gRPC REQUEST ----------
-        Network.JobRequest request =
-                Network.JobRequest.newBuilder()
+        NetworkProto.JobRequest request =
+                NetworkProto.JobRequest.newBuilder()
                         .setInputSourcePointer(inputPath)
                         .setOutputDestinationPointer(outputPath)
                         .setKeyValueDelimiter(kvDelim)
@@ -109,7 +109,7 @@ public class ConsoleClient {
                         .build();
 
         // ---------- SUBMIT JOB ----------
-        network.Network.JobResult result;
+        NetworkProto.JobResult result;
         try {
             result = stub.submitJob(request);
         } catch (Exception e) {

@@ -14,7 +14,7 @@ service ProcessService {
 // -------- READ --------
 
 message ReadRequest {
-  string sourcePointer = 1;
+  optional string sourcePointer = 1;
 }
 
 message ReadResponse {
@@ -29,11 +29,11 @@ enum StatusCode {
 }
 
 message WriteRequest {
-  string destinationPointer = 1;
-  string payload = 2;
+  optional string destinationPointer = 1;
+  optional string payload = 2;
 }
 
 message WriteResponse {
-  StatusCode code = 1;
-  string message = 2;
+  optional StatusCode code = 1;
+  optional string message = 2;
 }

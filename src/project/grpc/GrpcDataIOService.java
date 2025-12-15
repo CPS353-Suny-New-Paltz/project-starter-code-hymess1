@@ -5,23 +5,20 @@ import java.util.List;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 
-import process.Process;
-import process.ProcessServiceGrpc;
+import project.grpc.process.ProcessProto;
+import project.grpc.process.ProcessServiceGrpc;
 
 import project.api.process.DataIOService;
 
-
- //gRPC adapter for the Process API.
- 
- //Implements DataIOService but gives the work to a 
- //Process gRPC server.
- 
+// gRPC adapter for the Process API.
+//
+// Implements DataIOService but gives the work to a
+// Process gRPC server.
 public class GrpcDataIOService implements DataIOService {
 
     private final ManagedChannel channel;
     private final ProcessServiceGrpc.ProcessServiceBlockingStub stub;
 
-   
     public GrpcDataIOService(String host, int port) {
         this.channel = ManagedChannelBuilder
                 .forAddress(host, port)
@@ -31,8 +28,6 @@ public class GrpcDataIOService implements DataIOService {
         this.stub = ProcessServiceGrpc.newBlockingStub(channel);
     }
 
-    
-    
     @Override
     public DataReadResponse read(DataReadRequest request) {
 
@@ -46,14 +41,14 @@ public class GrpcDataIOService implements DataIOService {
             return () -> List.of();
         }
 
-        // -------- model tp proto --------
-        Process.ReadRequest protoReq =
-                Process.ReadRequest.newBuilder()
+        // -------- model to proto --------
+        ProcessProto.ReadRequest protoReq =
+                ProcessProto.ReadRequest.newBuilder()
                         .setSourcePointer(path)
                         .build();
 
         // -------- gRPC call --------
-        Process.ReadResponse protoRes;
+        ProcessProto.ReadResponse protoRes;
         try {
             protoRes = stub.read(protoReq);
         } catch (Exception e) {
@@ -65,7 +60,6 @@ public class GrpcDataIOService implements DataIOService {
         return () -> payload;
     }
 
-    
     @Override
     public DataWriteResponse write(DataWriteRequest request) {
 
@@ -85,30 +79,28 @@ public class GrpcDataIOService implements DataIOService {
         }
 
         // -------- model to proto --------
-        Process.WriteRequest protoReq =
-                Process.WriteRequest.newBuilder()
+        ProcessProto.WriteRequest protoReq =
+                ProcessProto.WriteRequest.newBuilder()
                         .setDestinationPointer(path)
                         .setPayload(payload)
                         .build();
 
         // -------- gRPC call --------
-        Process.WriteResponse protoRes;
+        ProcessProto.WriteResponse protoRes;
         try {
             protoRes = stub.write(protoReq);
         } catch (Exception e) {
             return failure("gRPC write failed: " + e.getMessage());
         }
 
-        // -------- PROTO to MODEL --------
-        if (protoRes.getCode() == Process.StatusCode.SUCCESS) {
+        // -------- proto to model --------
+        if (protoRes.getCode() == ProcessProto.StatusCode.SUCCESS) {
             return success(protoRes.getMessage());
         } else {
             return failure(protoRes.getMessage());
         }
-
     }
 
-   
     public void shutdown() {
         channel.shutdown();
     }
