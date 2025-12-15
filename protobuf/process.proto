@@ -1,39 +1,39 @@
-syntax = "proto3";
+syntax = "proto2";
 
 package process;
 
-option java_package = "process";
-option java_outer_classname = "Process";
+option java_package = "project.grpc.process";
+option java_outer_classname = "ProcessProto";
 
-// gRPC service for the Process API 
-service DataIOService {
+// gRPC service for the Process API
+service ProcessService {
   rpc Read (ReadRequest) returns (ReadResponse);
   rpc Write (WriteRequest) returns (WriteResponse);
 }
 
 // -------- READ --------
 
-// For DataReadRequest + DataPointer
 message ReadRequest {
   string sourcePointer = 1;
 }
 
-// Mirrors DataReadResponse
 message ReadResponse {
-  repeated int32 payload = 1;
+  repeated int32 values = 1;
 }
 
 // -------- WRITE --------
 
-// For DataWriteRequest + DataPointer
+enum StatusCode {
+  SUCCESS = 0;
+  FAILURE = 1;
+}
+
 message WriteRequest {
   string destinationPointer = 1;
   string payload = 2;
 }
 
-// For DataWriteResponse
 message WriteResponse {
-  bool success = 1;
+  StatusCode code = 1;
   string message = 2;
 }
-

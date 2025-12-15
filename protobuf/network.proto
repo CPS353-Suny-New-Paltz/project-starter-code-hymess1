@@ -1,13 +1,13 @@
-syntax = "proto3";
+syntax = "proto2";
 
 package network;
 
-option java_package = "network";
-option java_outer_classname = "Network";
+option java_package = "project.grpc.network";
+option java_outer_classname = "NetworkProto";
 
 // gRPC service 
 service NetworkService {
-  rpc SubmitJob (JobRequest) returns (JobResult);
+  rpc submitJob (JobRequest) returns (JobResult);
 }
 
 // For project.model.JobRequest
@@ -20,7 +20,7 @@ message JobRequest {
 
 // For project.model.JobResult
 message JobResult {
-  bool success = 1;
-  string resultText = 2;
-  string errorMessage = 3;
+  optional bool success = 1;
+  optional string resultText = 2;
+  optional string errorMessage = 3;
 }
