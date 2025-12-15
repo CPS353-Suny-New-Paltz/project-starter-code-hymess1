@@ -10,3 +10,7 @@ bin
 *.class
 .DS_Store
 .DS_Store
+client_input.txt
+input_numbers.txt
+output_results.txt
+temp_output.tmp
