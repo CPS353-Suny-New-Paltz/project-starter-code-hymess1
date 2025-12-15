@@ -5,17 +5,17 @@ package network;
 option java_package = "project.grpc.network";
 option java_outer_classname = "NetworkProto";
 
-// gRPC service 
+// gRPC service
 service NetworkService {
   rpc submitJob (JobRequest) returns (JobResult);
 }
 
 // For project.model.JobRequest
 message JobRequest {
-  string inputSourcePointer = 1;
-  string outputDestinationPointer = 2;
-  string pairDelimiter = 3;
-  string keyValueDelimiter = 4;
+  required string inputSourcePointer = 1;
+  required string outputDestinationPointer = 2;
+  required string pairDelimiter = 3;
+  required string keyValueDelimiter = 4;
 }
 
 // For project.model.JobResult
