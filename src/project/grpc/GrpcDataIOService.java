@@ -100,11 +100,12 @@ public class GrpcDataIOService implements DataIOService {
         }
 
         // -------- PROTO to MODEL --------
-        if (protoRes.getSuccess()) {
+        if (protoRes.getCode() == Process.StatusCode.SUCCESS) {
             return success(protoRes.getMessage());
         } else {
             return failure(protoRes.getMessage());
         }
+
     }
 
    

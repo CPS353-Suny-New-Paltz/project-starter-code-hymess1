@@ -18,7 +18,7 @@ sourceSets {
             ]
         }
         proto {
-            srcDir 'src/main/proto'
+             srcDir 'protobuf'
         }
     }
     test {
