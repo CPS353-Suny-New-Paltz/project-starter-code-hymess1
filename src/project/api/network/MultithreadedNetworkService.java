@@ -21,7 +21,7 @@ import project.model.JobResult;
  * Uses a fixed thread pool to run conceptual compute calls in parallel.
  * All I/O (DataIOService.read/write) is still done on a single thread.
  */
-public class MultithreadedNetworkService extends NetworkServiceImpl {
+public class MultithreadedNetworkService extends NetworkServiceImpl implements AutoCloseable {
 
     private final ExecutorService executor;
 
@@ -191,6 +191,10 @@ public class MultithreadedNetworkService extends NetworkServiceImpl {
      * Allow tests to cleanly shut down the thread pool.
      */
     public void shutdown() {
+        executor.shutdown();
+    }
+    @Override
+    public void close() {
         executor.shutdown();
     }
 }

@@ -16,7 +16,7 @@ import project.api.process.DataIOService.DataWriteResponse;
 
 /**
  * Reads integers from a file and writes results back to a file.
- * Updated with full validation + defensive exception handling for Checkpoint 5.
+ * Updated with full validation + exception handling for Checkpoint 5.
  */
 public class DataIOServiceImpl implements DataIOService {
 

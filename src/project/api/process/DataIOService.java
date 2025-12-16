@@ -3,7 +3,7 @@ import java.util.List;
 import project.annotations.ProcessAPI;
 
 /**
- * Process boundary API: data storage system ↔ compute engine.
+ * Process boundary API: data storage system to compute engine.
  * Abstracts IO details behind stable wrapper types.
  */
 @ProcessAPI

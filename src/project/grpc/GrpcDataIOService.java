@@ -41,7 +41,7 @@ public class GrpcDataIOService implements DataIOService {
             return () -> List.of();
         }
 
-        // -------- model to proto --------
+        // -------- model to Proto --------
         ProcessProto.ReadRequest protoReq =
                 ProcessProto.ReadRequest.newBuilder()
                         .setSourcePointer(path)
