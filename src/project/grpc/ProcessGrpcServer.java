@@ -96,7 +96,7 @@ public class ProcessGrpcServer extends ProcessServiceGrpc.ProcessServiceImplBase
                 .build()
                 .start();
 
-        System.out.println("Process gRPC server started on port " + port);
+        System.out.println("Process gRPC server started on port " + server.getPort());
         return server;
     }
 }
