@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import java.util.List;
 
 import project.api.conceptual.EngineComputeAPI;
-import project.api.conceptual.EngineComputeAPIImpl;
+import project.api.conceptual.EngineComputeAPIOptimizedImpl;
 import project.api.network.NetworkService;
 import project.api.network.NetworkServiceImpl;
 import project.api.network.MultithreadedNetworkService;
@@ -33,7 +33,7 @@ public class ComputeEngineIntegrationTest {
         DataIOService dataIO = new InMemoryDataIOService(input, output);
 
         // ----- 2. Real implementations for integration -----
-        EngineComputeAPI engine = new EngineComputeAPIImpl();
+        EngineComputeAPI engine = new EngineComputeAPIOptimizedImpl();
         int maxThreads = 4; // same upper bound you use elsewhere
         NetworkService network =
                 new MultithreadedNetworkService(dataIO, engine, maxThreads);
