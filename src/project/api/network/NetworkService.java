@@ -5,7 +5,7 @@ import project.model.JobRequest;
 import project.model.JobResult;
 
 /**
- * Network boundary API: user ↔ compute engine.
+ * Network boundary API: user to compute engine.
  * Returns a wrapper (JobResult) and never throws across the boundary.
  */
 @NetworkAPI

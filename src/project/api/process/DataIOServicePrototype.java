@@ -23,7 +23,7 @@ public class DataIOServicePrototype {
         // Call the read() method
         DataReadResponse readResponse = api.read(readRequest);
 
-        // Convert List<Integer> → comma-separated string for writing
+        // Convert List<Integer> to comma-separated string for writing
         List<Integer> ints = readResponse.payload();
         String joined = (ints == null)
                 ? ""

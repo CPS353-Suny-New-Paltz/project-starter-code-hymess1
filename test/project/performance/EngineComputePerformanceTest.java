@@ -7,7 +7,7 @@ import project.api.conceptual.EngineComputeAPIImpl;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class EngineComputePerformanceTest {
-
+	// Baseline: ~51 ms for 10,000 iterations
     @Test
     public void measureComputeEnginePerformance() {
 
@@ -15,9 +15,9 @@ public class EngineComputePerformanceTest {
 
         // Larger inputs can cause worst-case behavior
         int[] inputs = {
-        	    999_983,     // prime near 1M
-        	    999_979,     // prime
-        	    999_961      // prime
+        	    999_983,     
+        	    999_979,     
+        	    999_961      
         	};
 
 
