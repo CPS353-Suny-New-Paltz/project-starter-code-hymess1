@@ -32,10 +32,19 @@ public class GrpcEndToEndTest {
 
     @AfterEach
     void cleanup() {
-        if (channel != null) channel.shutdownNow();
-        if (networkServer != null) networkServer.shutdownNow();
-        if (grpcDataIO != null) grpcDataIO.shutdown();
-        if (processServer != null) processServer.shutdownNow();
+    	if (channel != null) {
+    	    channel.shutdownNow();
+    	}
+    	if (networkServer != null) {
+    	    networkServer.shutdownNow();
+    	}
+    	if (grpcDataIO != null) {
+    	    grpcDataIO.shutdown();
+    	}
+    	if (processServer != null) {
+    	    processServer.shutdownNow();
+    	}
+
     }
 
     @Test
