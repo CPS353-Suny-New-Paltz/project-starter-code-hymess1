@@ -76,7 +76,7 @@ public class NetworkGrpcServer extends NetworkServiceGrpc.NetworkServiceImplBase
                 .build()
                 .start();
 
-        System.out.println("Network gRPC server started on port " + port);
+        System.out.println("Network gRPC server started on port " + server.getPort());
         return server;
     }
 }
