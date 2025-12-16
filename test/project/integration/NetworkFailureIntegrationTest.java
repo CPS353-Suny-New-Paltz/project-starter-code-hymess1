@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import project.api.conceptual.EngineComputeAPIImpl;
+import project.api.conceptual.EngineComputeAPIOptimizedImpl;
 import project.api.network.NetworkService;
 import project.api.network.NetworkServiceImpl;
 import project.api.process.DataIOService;
@@ -40,7 +40,7 @@ public class NetworkFailureIntegrationTest {
     @Test
     public void testExceptionInDataIOIsCaughtByNetworkLayer() {
         // --- Real compute engine ---
-        var engine = new EngineComputeAPIImpl();
+    	var engine = new EngineComputeAPIOptimizedImpl();
 
         // --- Failing DataIO ---
         var dataIO = new ExplodingDataIO();
